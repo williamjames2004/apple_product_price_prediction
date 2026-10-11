@@ -1,0 +1,1566 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Product Price Prediction using a Decision Tree Regressor. Explore product pricing data, algorithm details, model evaluation and interactive price prediction.">
+    <meta name="keywords" content="product price prediction, machine learning, decision tree regressor, Python, Flask, price prediction INR">
+    <title>Product Price Prediction | Machine Learning Project</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --secondary: #0f172a;
+            --soft: #eef2ff;
+            --page: #f8fafc;
+            --muted: #64748b;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 85px;
+        }
+
+        body {
+            background: var(--page);
+            color: #1e293b;
+            font-family: Arial, Helvetica, sans-serif;
+            line-height: 1.7;
+        }
+
+        .navbar {
+            background: rgba(15, 23, 42, .97);
+        }
+
+        .navbar-brand {
+            font-weight: 800;
+            letter-spacing: .3px;
+        }
+
+        .navbar .nav-link {
+            color: #e2e8f0;
+        }
+
+        .navbar .nav-link:hover {
+            color: #a5b4fc;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #0f172a, #312e81, #4f46e5);
+            color: white;
+            padding: 100px 0 85px;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.3rem, 5vw, 4.2rem);
+            font-weight: 800;
+            line-height: 1.15;
+        }
+
+        .hero p {
+            color: #e0e7ff;
+            max-width: 760px;
+        }
+
+        .hero-chip {
+            display: inline-block;
+            border: 1px solid rgba(255,255,255,.35);
+            background: rgba(255,255,255,.1);
+            border-radius: 50px;
+            padding: 7px 14px;
+            margin: 4px;
+            font-size: .88rem;
+        }
+
+        .section-space {
+            padding: 75px 0;
+        }
+
+        .section-title {
+            font-weight: 800;
+            color: var(--secondary);
+            letter-spacing: -.5px;
+        }
+
+        .section-subtitle {
+            max-width: 800px;
+            color: var(--muted);
+        }
+
+        .project-card {
+            height: 100%;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 18px;
+            padding: 25px;
+            transition: transform .2s, box-shadow .2s;
+        }
+
+        .project-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 28px rgba(15,23,42,.08);
+        }
+
+        .icon-box {
+            width: 48px;
+            height: 48px;
+            border-radius: 13px;
+            background: var(--soft);
+            color: var(--primary);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.35rem;
+            margin-bottom: 15px;
+        }
+
+        .content-panel {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 18px;
+            padding: 28px;
+            height: 100%;
+        }
+
+        .soft-section {
+            background: #eef2ff;
+        }
+
+        .metric {
+            background: white;
+            border: 1px solid #e2e8f0;
+            padding: 24px;
+            border-radius: 16px;
+            height: 100%;
+        }
+
+        .metric-value {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--primary);
+            overflow-wrap: anywhere;
+        }
+
+        .table thead th {
+            background: #eef2ff;
+            color: #312e81;
+            white-space: nowrap;
+        }
+
+        .table td, .table th {
+            padding: 13px;
+            vertical-align: middle;
+        }
+
+        .algorithm-step {
+            border-left: 4px solid var(--primary);
+            padding: 5px 0 5px 20px;
+            margin-bottom: 24px;
+        }
+
+        .formula {
+            background: #0f172a;
+            color: #e0e7ff;
+            border-radius: 12px;
+            padding: 20px;
+            overflow-x: auto;
+            font-family: Consolas, monospace;
+        }
+
+        .form-section {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 22px;
+            padding: 30px;
+            box-shadow: 0 15px 45px rgba(15,23,42,.06);
+        }
+
+        .form-label {
+            font-weight: 700;
+            color: #334155;
+        }
+
+        .form-control, .form-select {
+            min-height: 47px;
+            border-color: #cbd5e1;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 .2rem rgba(79,70,229,.13);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .btn-primary:hover {
+            background: #3730a3;
+            border-color: #3730a3;
+        }
+
+        .result-panel {
+            background: #eef2ff;
+            border: 1px solid #c7d2fe;
+            border-radius: 18px;
+            padding: 25px;
+        }
+
+        .price-result {
+            color: #3730a3;
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 800;
+            overflow-wrap: anywhere;
+        }
+
+        .faq .accordion-item {
+            border: 1px solid #e2e8f0;
+            margin-bottom: 12px;
+            border-radius: 12px !important;
+            overflow: hidden;
+        }
+
+        .faq .accordion-button {
+            font-weight: 700;
+            padding: 18px;
+        }
+
+        .faq .accordion-button:not(.collapsed) {
+            color: #3730a3;
+            background: #eef2ff;
+            box-shadow: none;
+        }
+
+        .faq .accordion-button:focus {
+            box-shadow: none;
+        }
+
+        .copyright-panel {
+            background: #0f172a;
+            color: #cbd5e1;
+            border-radius: 20px;
+            padding: 30px;
+        }
+
+        .copyright-panel h3,
+        .copyright-panel h4 {
+            color: white;
+        }
+
+        .copyright-panel a {
+            color: #a5b4fc;
+        }
+
+        footer {
+            background: #020617;
+            color: #cbd5e1;
+            padding: 30px 0;
+        }
+
+        footer a {
+            color: #c7d2fe;
+            text-decoration: none;
+        }
+
+        .small-muted {
+            font-size: .9rem;
+            color: var(--muted);
+        }
+
+        .required-mark {
+            color: #dc2626;
+        }
+
+        @media (max-width: 767px) {
+            .hero {
+                padding: 75px 0 60px;
+            }
+
+            .section-space {
+                padding: 55px 0;
+            }
+
+            .form-section, .content-panel {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+    <div class="container">
+        <a class="navbar-brand" href="#home">
+            <i class="bi bi-graph-up-arrow me-2"></i>PricePredict AI
+        </a>
+
+        <button class="navbar-toggler" type="button"
+                data-bs-toggle="collapse" data-bs-target="#mainNavbar"
+                aria-controls="mainNavbar" aria-expanded="false"
+                aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="mainNavbar">
+            <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-1">
+                <li class="nav-item"><a class="nav-link" href="#overview">Overview</a></li>
+                <li class="nav-item"><a class="nav-link" href="#dataset">Dataset</a></li>
+                <li class="nav-item"><a class="nav-link" href="#algorithm">Algorithm</a></li>
+                <li class="nav-item"><a class="nav-link" href="#performance">Evaluation</a></li>
+                <li class="nav-item"><a class="nav-link" href="#predict">Predict</a></li>
+                <li class="nav-item"><a class="nav-link" href="#faq">Help</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<header class="hero" id="home">
+    <div class="container">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-8">
+                <span class="hero-chip"><i class="bi bi-cpu me-1"></i>Machine Learning Project</span>
+                <span class="hero-chip"><i class="bi bi-diagram-3 me-1"></i>Decision Tree Regression</span>
+
+                <h1 class="mt-4 mb-4">
+                    Predict Product Prices<br>
+                    <span class="text-warning">With Machine Learning</span>
+                </h1>
+
+                <p class="fs-5">
+                    Explore how product details, launch price, discounts, shopping
+                    platforms, customer ratings and review counts can be used to
+                    estimate a product's current price in Indian rupees.
+                </p>
+
+                <div class="d-flex flex-wrap gap-3 mt-4">
+                    <a href="#predict" class="btn btn-light btn-lg">
+                        <i class="bi bi-calculator me-2"></i>Try a Prediction
+                    </a>
+                    <a href="#algorithm" class="btn btn-outline-light btn-lg">
+                        Explore the Algorithm
+                    </a>
+                </div>
+
+                <p class="small mt-4 mb-0">
+                    This is an educational machine learning demonstration.
+                    Predictions are estimates, not guaranteed market prices.
+                </p>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="content-panel">
+                    <div class="icon-box"><i class="bi bi-currency-rupee"></i></div>
+                    <h3 class="text-dark fw-bold">Price Estimation</h3>
+                    <p class="text-secondary">
+                        Submit a product profile and receive a predicted current
+                        price based on patterns learned from the training data.
+                    </p>
+                    <hr>
+                    <div class="d-flex justify-content-between">
+                        <span class="text-secondary">Model</span>
+                        <strong class="text-dark">Decision Tree</strong>
+                    </div>
+                    <div class="d-flex justify-content-between mt-2">
+                        <span class="text-secondary">Task</span>
+                        <strong class="text-dark">Regression</strong>
+                    </div>
+                    <div class="d-flex justify-content-between mt-2">
+                        <span class="text-secondary">Currency</span>
+                        <strong class="text-dark">INR (₹)</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<main>
+
+<section class="section-space" id="overview">
+    <div class="container">
+        <div class="mb-5">
+            <span class="text-primary fw-bold text-uppercase small">Project Overview</span>
+            <h2 class="section-title display-6 mt-2">About This Project</h2>
+            <p class="section-subtitle">
+                This project demonstrates a complete machine learning workflow:
+                loading historical product records, preparing input features,
+                training a regression model, evaluating its predictions and
+                serving the trained model through a Flask web application.
+            </p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-3">
+                <div class="project-card">
+                    <div class="icon-box"><i class="bi bi-database"></i></div>
+                    <h5 class="fw-bold">Dataset Analysis</h5>
+                    <p class="text-secondary mb-0">
+                        Uses product records containing platform, category,
+                        condition, pricing, discounts, ratings and reviews.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3">
+                <div class="project-card">
+                    <div class="icon-box"><i class="bi bi-diagram-3"></i></div>
+                    <h5 class="fw-bold">Decision Tree</h5>
+                    <p class="text-secondary mb-0">
+                        Learns feature-based decision rules and predicts a
+                        continuous numerical price.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3">
+                <div class="project-card">
+                    <div class="icon-box"><i class="bi bi-speedometer2"></i></div>
+                    <h5 class="fw-bold">Model Evaluation</h5>
+                    <p class="text-secondary mb-0">
+                        Reports Mean Absolute Error and, when calculable,
+                        the coefficient of determination R².
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3">
+                <div class="project-card">
+                    <div class="icon-box"><i class="bi bi-window"></i></div>
+                    <h5 class="fw-bold">Interactive Website</h5>
+                    <p class="text-secondary mb-0">
+                        Accepts new product information and displays an
+                        estimated price through a browser form.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-panel mt-4">
+            <h4 class="fw-bold">Project Objectives</h4>
+            <ul class="mb-0">
+                <li>Understand how product attributes relate to current prices.</li>
+                <li>Apply preprocessing to categorical and numerical features.</li>
+                <li>Train a Decision Tree Regressor using historical examples.</li>
+                <li>Measure prediction errors on a held-out test dataset.</li>
+                <li>Demonstrate a trained machine learning model using Flask.</li>
+                <li>Understand the limitations of predictions made from historical data.</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<section class="section-space soft-section" id="dataset">
+    <div class="container">
+        <span class="text-primary fw-bold text-uppercase small">Data Understanding</span>
+        <h2 class="section-title display-6 mt-2">Dataset Columns Explained</h2>
+        <p class="section-subtitle mb-4">
+            The original dataset includes date, product identification,
+            launch prices, current prices, discounts and customer feedback.
+            The model excludes some original columns and uses nine input features.
+        </p>
+
+        <div class="content-panel mb-4">
+            <h4 class="fw-bold">Input Features Used by the Model</h4>
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Column</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                            <th>Example</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>Platform</code></td>
+                            <td>Categorical</td>
+                            <td>Shopping platform where the product is listed.</td>
+                            <td>Amazon, Flipkart</td>
+                        </tr>
+                        <tr>
+                            <td><code>Product_Category</code></td>
+                            <td>Categorical</td>
+                            <td>Product's general category.</td>
+                            <td>Watch, Phone</td>
+                        </tr>
+                        <tr>
+                            <td><code>Condition</code></td>
+                            <td>Categorical</td>
+                            <td>Condition of the listed product.</td>
+                            <td>New, Used</td>
+                        </tr>
+                        <tr>
+                            <td><code>Launch_Price_INR</code></td>
+                            <td>Numerical</td>
+                            <td>Original launch price in Indian rupees.</td>
+                            <td>42042</td>
+                        </tr>
+                        <tr>
+                            <td><code>Discount_Pct</code></td>
+                            <td>Numerical</td>
+                            <td>Discount percentage recorded in the dataset.</td>
+                            <td>10, -1.6</td>
+                        </tr>
+                        <tr>
+                            <td><code>Sale_Event</code></td>
+                            <td>Categorical</td>
+                            <td>Sale or promotional event.</td>
+                            <td>None, Diwali</td>
+                        </tr>
+                        <tr>
+                            <td><code>Stock_Status</code></td>
+                            <td>Categorical</td>
+                            <td>Availability status of the product.</td>
+                            <td>In Stock</td>
+                        </tr>
+                        <tr>
+                            <td><code>Rating</code></td>
+                            <td>Numerical</td>
+                            <td>Customer rating, normally on a 0–5 scale.</td>
+                            <td>4.7</td>
+                        </tr>
+                        <tr>
+                            <td><code>Reviews_Count</code></td>
+                            <td>Numerical</td>
+                            <td>Number of recorded customer reviews.</td>
+                            <td>110</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="content-panel mb-4">
+            <h4 class="fw-bold">Original Dataset Columns</h4>
+            <div class="table-responsive">
+                <table class="table table-bordered mb-0">
+                    <thead>
+                        <tr><th>Original Column</th><th>Purpose</th><th>Model Treatment</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><code>Date</code></td><td>Date of the recorded observation.</td><td>Excluded</td></tr>
+                        <tr><td><code>Platform</code></td><td>Marketplace.</td><td>Input feature</td></tr>
+                        <tr><td><code>Product_Category</code></td><td>Product category.</td><td>Input feature</td></tr>
+                        <tr><td><code>Model_Name</code></td><td>Specific product model.</td><td>Excluded</td></tr>
+                        <tr><td><code>Condition</code></td><td>New or used condition.</td><td>Input feature</td></tr>
+                        <tr><td><code>Launch_Price_USD</code></td><td>Launch price in US dollars.</td><td>Excluded</td></tr>
+                        <tr><td><code>Launch_Price_INR</code></td><td>Launch price in rupees.</td><td>Input feature</td></tr>
+                        <tr><td><code>Current_Price_USD</code></td><td>Current price in US dollars.</td><td>Excluded</td></tr>
+                        <tr><td><code>Current_Price_INR</code></td><td>Current price in rupees.</td><td>Prediction target</td></tr>
+                        <tr><td><code>Discount_Pct</code></td><td>Recorded discount percentage.</td><td>Input feature</td></tr>
+                        <tr><td><code>Sale_Event</code></td><td>Sale event information.</td><td>Input feature</td></tr>
+                        <tr><td><code>Stock_Status</code></td><td>Product availability.</td><td>Input feature</td></tr>
+                        <tr><td><code>Rating</code></td><td>Customer rating.</td><td>Input feature</td></tr>
+                        <tr><td><code>Reviews_Count</code></td><td>Review count.</td><td>Input feature</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <p class="small-muted mt-3 mb-0">
+                Note: The excluded columns are removed before training. The target
+                column, Current_Price_INR, is kept separately as the value to predict.
+            </p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-6">
+                <div class="content-panel">
+                    <h5 class="fw-bold"><i class="bi bi-arrow-left-right text-primary me-2"></i>Input (X)</h5>
+                    <p class="mb-0">
+                        Nine product attributes supplied to the model to estimate
+                        a price. The input must use the same column names and
+                        compatible value formats used during training.
+                    </p>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="content-panel">
+                    <h5 class="fw-bold"><i class="bi bi-bullseye text-primary me-2"></i>Target (y)</h5>
+                    <p class="mb-0">
+                        <code>Current_Price_INR</code> is the target variable.
+                        It contains the historical current price in rupees that
+                        the regression model learns to estimate.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-space" id="algorithm">
+    <div class="container">
+        <span class="text-primary fw-bold text-uppercase small">Machine Learning Theory</span>
+        <h2 class="section-title display-6 mt-2">Decision Tree Regressor Explained</h2>
+        <p class="section-subtitle mb-5">
+            A Decision Tree Regressor is a supervised machine learning algorithm
+            that predicts numerical values by learning a sequence of feature-based
+            rules from training examples.
+        </p>
+
+        <div class="content-panel mb-4">
+            <h4 class="fw-bold">1. What is a Decision Tree?</h4>
+            <p>
+                A decision tree organizes learned rules into a tree-like structure.
+                Each internal node checks a condition on a feature, each branch
+                represents the result of that condition, and each leaf provides
+                a prediction.
+            </p>
+            <p>
+                For example, a simplified tree might first split products by
+                launch price, then split a group by rating or discount. After
+                following the relevant branches, the model produces a predicted
+                current price.
+            </p>
+            <div class="formula">
+                Product Features<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;↓<br>
+                Check a learned feature condition<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;↓<br>
+                Follow the matching branch<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;↓<br>
+                Continue until a leaf is reached<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;↓<br>
+                Predicted Current Price (INR)
+            </div>
+            <p class="small-muted mb-0">
+                This is an illustrative flow, not the exact set of rules learned
+                by your trained model.
+            </p>
+        </div>
+
+        <div class="content-panel mb-4">
+            <h4 class="fw-bold">2. How Does Regression Work?</h4>
+            <p>
+                Classification predicts a category, such as spam or not spam.
+                Regression predicts a numerical quantity, such as price, salary
+                or house value. This project uses regression because the target
+                <code>Current_Price_INR</code> is a continuous numerical value.
+            </p>
+            <p>
+                During training, the algorithm searches for splits that divide
+                the records into groups with lower variation in their target prices.
+                At a leaf, the usual Decision Tree Regressor prediction is the mean
+                target value of the training samples that reach that leaf.
+            </p>
+        </div>
+
+        <div class="content-panel mb-4">
+            <h4 class="fw-bold">3. How Does the Tree Choose a Split?</h4>
+            <p>
+                The tree evaluates candidate feature thresholds and compares the
+                squared errors within the resulting groups. A useful split creates
+                groups whose target prices are more consistent.
+            </p>
+            <div class="formula">
+                Mean Squared Error = (1 / n) × Σ (yᵢ − ȳ)²
+            </div>
+            <p class="mt-3 mb-0">
+                Here, <strong>yᵢ</strong> is an actual target price, <strong>ȳ</strong>
+                is the mean target price in the group, and <strong>n</strong> is the
+                number of records in that group. The tree chooses splits that reduce
+                the impurity measure according to its splitting criterion.
+            </p>
+        </div>
+
+        <div class="content-panel mb-4">
+            <h4 class="fw-bold">4. Data Preprocessing</h4>
+
+            <div class="algorithm-step">
+                <h6 class="fw-bold">Step 1 — Select relevant features</h6>
+                <p class="mb-0">
+                    The application uses nine input columns and excludes the
+                    target column from the inputs.
+                </p>
+            </div>
+
+            <div class="algorithm-step">
+                <h6 class="fw-bold">Step 2 — Handle missing values</h6>
+                <p class="mb-0">
+                    The model pipeline fills missing categorical values using
+                    the most frequent category and missing numerical values
+                    using the median of the training data.
+                </p>
+            </div>
+
+            <div class="algorithm-step">
+                <h6 class="fw-bold">Step 3 — Encode categorical features</h6>
+                <p class="mb-0">
+                    OneHotEncoder converts text categories into numeric indicator
+                    columns. For example, different platform values become
+                    separate encoded features. Unseen categories are ignored
+                    instead of causing an encoding error.
+                </p>
+            </div>
+
+            <div class="algorithm-step">
+                <h6 class="fw-bold">Step 4 — Keep numerical features numeric</h6>
+                <p class="mb-0">
+                    Launch price, discount percentage, rating and review count
+                    remain numerical. Decision trees do not require numerical
+                    feature standardization.
+                </p>
+            </div>
+
+            <div class="algorithm-step mb-0">
+                <h6 class="fw-bold">Step 5 — Train the regressor</h6>
+                <p class="mb-0">
+                    The preprocessor and Decision Tree Regressor are combined
+                    in one pipeline, ensuring that the same transformations
+                    are applied during training and prediction.
+                </p>
+            </div>
+        </div>
+
+        <div class="content-panel mb-4">
+            <h4 class="fw-bold">5. Why Is max_depth Set to 8?</h4>
+            <p>
+                Your model uses <code>max_depth=8</code>. This limits the maximum
+                depth of the tree and can reduce the risk of learning overly
+                specific rules from the training data.
+            </p>
+            <p class="mb-0">
+                A tree that is too deep may overfit, memorizing patterns that do
+                not generalize well. A tree that is too shallow may underfit and
+                miss useful relationships. The best depth depends on the dataset
+                and should ideally be selected using validation or cross-validation.
+            </p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-6">
+                <div class="content-panel">
+                    <h4 class="fw-bold text-success">Advantages</h4>
+                    <ul class="mb-0">
+                        <li>Easy to explain compared with many complex models.</li>
+                        <li>Can learn nonlinear relationships.</li>
+                        <li>Can represent interactions between features.</li>
+                        <li>Does not require feature scaling.</li>
+                        <li>Works with encoded categorical and numerical data.</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="content-panel">
+                    <h4 class="fw-bold text-danger">Limitations</h4>
+                    <ul class="mb-0">
+                        <li>Can overfit if the tree is too complex.</li>
+                        <li>Predictions can change when training data changes.</li>
+                        <li>Leaf predictions may be poor for unseen price ranges.</li>
+                        <li>Historical patterns may not represent today's market.</li>
+                        <li>Data errors and biased samples affect reliability.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-space soft-section" id="performance">
+    <div class="container">
+        <span class="text-primary fw-bold text-uppercase small">Model Evaluation</span>
+        <h2 class="section-title display-6 mt-2">How Well Does the Model Perform?</h2>
+        <p class="section-subtitle mb-4">
+            The application evaluates predictions using a held-out test split
+            when at least ten valid records are available. The reported metrics
+            are calculated before the final model is retrained on all records.
+        </p>
+
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-3">
+                <div class="metric">
+                    <div class="text-secondary">Training Records</div>
+                    <div class="metric-value">
+                        {{ accuracy.records if accuracy and accuracy.records is not none else 'N/A' }}
+                    </div>
+                    <div class="small-muted">Valid target-price rows</div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3">
+                <div class="metric">
+                    <div class="text-secondary">Test Records</div>
+                    <div class="metric-value">
+                        {{ accuracy.evaluation_records if accuracy and accuracy.evaluation_records else 'N/A' }}
+                    </div>
+                    <div class="small-muted">Records used for evaluation</div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3">
+                <div class="metric">
+                    <div class="text-secondary">Mean Absolute Error</div>
+                    <div class="metric-value">
+                        {% if accuracy and accuracy.mae is not none %}
+                            ₹{{ "{:,.2f}".format(accuracy.mae) }}
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </div>
+                    <div class="small-muted">Lower is generally better</div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3">
+                <div class="metric">
+                    <div class="text-secondary">R² Score</div>
+                    <div class="metric-value">
+                        {% if accuracy and accuracy.r2 is not none %}
+                            {{ accuracy.r2 }}
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </div>
+                    <div class="small-muted">Closer to 1 is generally better</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-panel mt-4">
+            <h4 class="fw-bold">Understanding the Metrics</h4>
+            <h6 class="fw-bold mt-3">Mean Absolute Error (MAE)</h6>
+            <p>
+                MAE is the average absolute difference between actual prices and
+                predicted prices. If MAE is ₹500, the model's predictions differ
+                from actual test prices by ₹500 on average in absolute terms.
+                This is an example for explanation, not a measured result from
+                your dataset.
+            </p>
+            <div class="formula">MAE = (1 / n) × Σ |Actual Price − Predicted Price|</div>
+
+            <h6 class="fw-bold mt-4">R² Score</h6>
+            <p class="mb-0">
+                R² compares the model against a baseline that predicts the mean
+                target value. A value near 1 indicates strong fit on the evaluated
+                data; a value near 0 means performance is similar to that baseline;
+                a negative value means the model performed worse than the baseline.
+                R² can be undefined or unreliable for very small test sets.
+            </p>
+        </div>
+
+        <div class="alert alert-info mt-4 mb-0">
+            <i class="bi bi-info-circle-fill me-2"></i>
+            No accuracy percentage is shown because this is a regression problem.
+            MAE and R² are more appropriate measures than classification accuracy.
+            Metrics depend on your actual <code>data.csv</code>.
+        </div>
+    </div>
+</section>
+
+<section class="section-space" id="predict">
+    <div class="container">
+        <div class="text-center mb-5">
+            <span class="text-primary fw-bold text-uppercase small">Interactive Demonstration</span>
+            <h2 class="section-title display-6 mt-2">Predict a Product's Current Price</h2>
+            <p class="section-subtitle mx-auto">
+                Enter the product information below. The trained model will use
+                these details to estimate the current price in Indian rupees.
+            </p>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="form-section">
+
+                    {% if error %}
+                    <div class="alert alert-danger" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        {{ error }}
+                    </div>
+                    {% endif %}
+
+                    {% if prediction is not none %}
+                    <div class="result-panel mb-4" role="status" aria-live="polite">
+                        <div class="d-flex align-items-center gap-3 mb-2">
+                            <i class="bi bi-check-circle-fill fs-2 text-primary"></i>
+                            <div>
+                                <h3 class="fw-bold mb-0">Prediction Completed</h3>
+                                <p class="text-secondary mb-0">Estimated current product price</p>
+                            </div>
+                        </div>
+
+                        <div class="price-result">
+                            ₹{{ "{:,.2f}".format(prediction) }}
+                        </div>
+
+                        <p class="text-secondary mb-0">
+                            This is a model-generated estimate, not a live marketplace quote.
+                            Actual prices can vary with seller, location, time and availability.
+                        </p>
+                    </div>
+                    {% endif %}
+
+                    <form method="POST" action="{{ url_for('index') }}" id="predictionForm">
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <label for="Platform" class="form-label">
+                                    Shopping Platform <span class="required-mark">*</span>
+                                </label>
+                                <select class="form-select" id="Platform" name="Platform" required>
+                                    <option value="">Choose platform</option>
+                                    <option value="Amazon" {% if form_data.get('Platform') == 'Amazon' %}selected{% endif %}>Amazon</option>
+                                    <option value="Flipkart" {% if form_data.get('Platform') == 'Flipkart' %}selected{% endif %}>Flipkart</option>
+                                    <option value="Other" {% if form_data.get('Platform') == 'Other' %}selected{% endif %}>Other</option>
+                                </select>
+                                <div class="form-text">Use a platform category represented in your training data when possible.</div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="Product_Category" class="form-label">
+                                    Product Category <span class="required-mark">*</span>
+                                </label>
+                                <input class="form-control" id="Product_Category"
+                                       name="Product_Category" list="categoryOptions"
+                                       placeholder="e.g. Watch, Smartphone, Laptop"
+                                       value="{{ form_data.get('Product_Category', '') }}" required>
+                                <datalist id="categoryOptions">
+                                    <option value="Watch">
+                                    <option value="Smartphone">
+                                    <option value="Laptop">
+                                    <option value="Tablet">
+                                    <option value="Headphones">
+                                    <option value="Television">
+                                </datalist>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="Condition" class="form-label">
+                                    Product Condition <span class="required-mark">*</span>
+                                </label>
+                                <select class="form-select" id="Condition" name="Condition" required>
+                                    <option value="">Choose condition</option>
+                                    <option value="New" {% if form_data.get('Condition') == 'New' %}selected{% endif %}>New</option>
+                                    <option value="Used" {% if form_data.get('Condition') == 'Used' %}selected{% endif %}>Used</option>
+                                    <option value="Refurbished" {% if form_data.get('Condition') == 'Refurbished' %}selected{% endif %}>Refurbished</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="Launch_Price_INR" class="form-label">
+                                    Launch Price (₹) <span class="required-mark">*</span>
+                                </label>
+                                <input class="form-control" type="number" id="Launch_Price_INR"
+                                       name="Launch_Price_INR" min="0" step="0.01"
+                                       placeholder="e.g. 42042"
+                                       value="{{ form_data.get('Launch_Price_INR', '') }}" required>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="Discount_Pct" class="form-label">
+                                    Discount Percentage <span class="required-mark">*</span>
+                                </label>
+                                <input class="form-control" type="number" id="Discount_Pct"
+                                       name="Discount_Pct" min="-100" max="100" step="0.1"
+                                       placeholder="e.g. 10 or -1.6"
+                                       value="{{ form_data.get('Discount_Pct', '') }}" required>
+                                <div class="form-text">Enter the percentage as represented in the dataset.</div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="Sale_Event" class="form-label">
+                                    Sale Event <span class="required-mark">*</span>
+                                </label>
+                                <select class="form-select" id="Sale_Event" name="Sale_Event" required>
+                                    <option value="">Choose sale event</option>
+                                    <option value="None" {% if form_data.get('Sale_Event') == 'None' %}selected{% endif %}>None</option>
+                                    <option value="Diwali" {% if form_data.get('Sale_Event') == 'Diwali' %}selected{% endif %}>Diwali</option>
+                                    <option value="Other" {% if form_data.get('Sale_Event') == 'Other' %}selected{% endif %}>Other</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="Stock_Status" class="form-label">
+                                    Stock Status <span class="required-mark">*</span>
+                                </label>
+                                <select class="form-select" id="Stock_Status" name="Stock_Status" required>
+                                    <option value="">Choose stock status</option>
+                                    <option value="In Stock" {% if form_data.get('Stock_Status') == 'In Stock' %}selected{% endif %}>In Stock</option>
+                                    <option value="Out of Stock" {% if form_data.get('Stock_Status') == 'Out of Stock' %}selected{% endif %}>Out of Stock</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="Rating" class="form-label">
+                                    Customer Rating (0–5) <span class="required-mark">*</span>
+                                </label>
+                                <input class="form-control" type="number" id="Rating" name="Rating"
+                                       min="0" max="5" step="0.1" placeholder="e.g. 4.7"
+                                       value="{{ form_data.get('Rating', '') }}" required>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="Reviews_Count" class="form-label">
+                                    Number of Reviews <span class="required-mark">*</span>
+                                </label>
+                                <input class="form-control" type="number" id="Reviews_Count"
+                                       name="Reviews_Count" min="0" step="1"
+                                       placeholder="e.g. 110"
+                                       value="{{ form_data.get('Reviews_Count', '') }}" required>
+                            </div>
+                        </div>
+
+                        <div class="d-flex flex-wrap gap-3 mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg" id="predictButton">
+                                <i class="bi bi-magic me-2"></i>Predict Current Price
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary btn-lg" id="sampleButton">
+                                <i class="bi bi-lightning me-2"></i>Load Sample
+                            </button>
+                            <button type="reset" class="btn btn-outline-danger btn-lg" id="resetButton">
+                                <i class="bi bi-arrow-counterclockwise me-2"></i>Clear Form
+                            </button>
+                        </div>
+                    </form>
+
+                    <p class="small-muted mt-4 mb-0">
+                        <i class="bi bi-shield-check me-1"></i>
+                        The form sends product attributes to your local Flask application.
+                        It does not retrieve real-time prices from Amazon or Flipkart.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-space soft-section" id="workflow">
+    <div class="container">
+        <span class="text-primary fw-bold text-uppercase small">End-to-End Workflow</span>
+        <h2 class="section-title display-6 mt-2">How the Prediction Happens</h2>
+
+        <div class="row g-4 mt-2">
+            <div class="col-md-6 col-lg-3">
+                <div class="project-card">
+                    <div class="icon-box"><i class="bi bi-ui-checks"></i></div>
+                    <h5 class="fw-bold">1. Enter Details</h5>
+                    <p class="text-secondary mb-0">Provide the nine required product attributes.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="project-card">
+                    <div class="icon-box"><i class="bi bi-gear"></i></div>
+                    <h5 class="fw-bold">2. Preprocess</h5>
+                    <p class="text-secondary mb-0">The saved pipeline fills missing values and encodes categories.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="project-card">
+                    <div class="icon-box"><i class="bi bi-diagram-3"></i></div>
+                    <h5 class="fw-bold">3. Run the Model</h5>
+                    <p class="text-secondary mb-0">The Decision Tree applies learned splits to the input.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="project-card">
+                    <div class="icon-box"><i class="bi bi-currency-rupee"></i></div>
+                    <h5 class="fw-bold">4. Display Price</h5>
+                    <p class="text-secondary mb-0">The browser displays the predicted current price in INR.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-space" id="faq">
+    <div class="container">
+        <span class="text-primary fw-bold text-uppercase small">Help Centre</span>
+        <h2 class="section-title display-6 mt-2">Frequently Asked Questions</h2>
+        <p class="section-subtitle mb-4">
+            Answers to common questions about the project, dataset, model and
+            prediction form.
+        </p>
+
+        <div class="accordion faq" id="faqAccordion">
+
+            <div class="accordion-item">
+                <h3 class="accordion-header">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                        1. What is this project about?
+                    </button>
+                </h3>
+                <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        It is a machine learning application that estimates a product's
+                        current price in Indian rupees from product details and historical data.
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <h3 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                        2. Which algorithm is used?
+                    </button>
+                </h3>
+                <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        The project uses scikit-learn's DecisionTreeRegressor with
+                        max_depth set to 8 and random_state set to 42.
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <h3 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                        3. Why is regression used instead of classification?
+                    </button>
+                </h3>
+                <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        The output is a numerical price, not a category. Regression is
+                        designed to predict continuous numerical values.
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <h3 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">
+                        4. What does Current_Price_INR mean?
+                    </button>
+                </h3>
+                <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        It is the target column containing the historical current price
+                        in Indian rupees. The model learns to estimate this value.
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <h3 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq5">
+                        5. What does MAE tell us?
+                    </button>
+                </h3>
+                <div id="faq5" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        Mean Absolute Error measures the average absolute difference
+                        between actual and predicted prices. It is expressed in rupees
+                        when the target is measured in INR. Lower is generally better.
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <h3 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq6">
+                        6. Why is accuracy not displayed?
+                    </button>
+                </h3>
+                <div id="faq6" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        Accuracy is commonly used for classification. This project
+                        predicts prices, so MAE and R² are more appropriate evaluation metrics.
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <h3 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq7">
+                        7. What does R² mean?
+                    </button>
+                </h3>
+                <div id="faq7" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        R² compares the model with a baseline that predicts the mean
+                        target value. A score near 1 generally indicates a strong fit
+                        on the evaluated dataset. Negative scores are possible.
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <h3 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq8">
+                        8. What is One-Hot Encoding?
+                    </button>
+                </h3>
+                <div id="faq8" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        One-Hot Encoding converts categories such as Amazon and Flipkart
+                        into separate numerical indicator columns so the model can process them.
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <h3 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq9">
+                        9. How are missing values handled?
+                    </button>
+                </h3>
+                <div id="faq9" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        In the prediction pipeline, missing categorical values are filled
+                        with the most frequent category and missing numerical values
+                        are filled with the median learned from the training data.
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <h3 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq10">
+                        10. Why is max_depth set to 8?
+                    </button>
+                </h3>
+                <div id="faq10" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        It limits tree depth to help control complexity and reduce
+                        overfitting. The value is a project setting, not a guarantee
+                        that this depth is optimal for every dataset.
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <h3 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq11">
+                        11. Can I enter a new product category?
+                    </button>
+                </h3>
+                <div id="faq11" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        Yes. The encoder is configured to ignore unknown categories
+                        rather than fail. However, predictions for categories absent
+                        from training may be less reliable.
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <h3 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq12">
+                        12. Is the predicted price guaranteed to be correct?
+                    </button>
+                </h3>
+                <div id="faq12" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        No. It is an estimate based on learned historical patterns.
+                        Live prices may differ because of seller changes, location,
+                        promotions, taxes, demand and product availability.
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <h3 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq13">
+                        13. Why are Date and Model_Name excluded?
+                    </button>
+                </h3>
+                <div id="faq13" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        The supplied training code explicitly excludes Date and Model_Name.
+                        This simplifies the feature set, but it may also remove useful
+                        time-related or product-specific information. Feature selection
+                        should be evaluated against the actual dataset.
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <h3 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq14">
+                        14. What is overfitting?
+                    </button>
+                </h3>
+                <div id="faq14" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        Overfitting occurs when a model learns training-specific patterns
+                        that do not generalize well to new data. Comparing training and
+                        validation performance can help detect it.
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <h3 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq15">
+                        15. What happens if data.csv is missing?
+                    </button>
+                </h3>
+                <div id="faq15" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        The application needs data.csv to train a new model. Place it
+                        in the same project folder as app.py and make sure its columns
+                        match the expected dataset schema.
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <h3 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq16">
+                        16. What is product_price_model.pkl?
+                    </button>
+                </h3>
+                <div id="faq16" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        It is the serialized scikit-learn pipeline saved with joblib.
+                        It contains the preprocessing steps and trained regressor used
+                        to make predictions without rebuilding the pipeline for each request.
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <h3 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq17">
+                        17. Does this website fetch live prices from marketplaces?
+                    </button>
+                </h3>
+                <div id="faq17" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        No. The application predicts from the trained model. It does not
+                        connect to marketplace APIs or scrape current product listings.
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <h3 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq18">
+                        18. How can prediction quality be improved?
+                    </button>
+                </h3>
+                <div id="faq18" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        Collect more representative records, validate data quality,
+                        compare algorithms, tune tree depth, use cross-validation,
+                        and test on newer data. Consider adding date and product model
+                        information if they improve performance without introducing leakage.
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <h3 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq19">
+                        19. What is data leakage?
+                    </button>
+                </h3>
+                <div id="faq19" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        Data leakage occurs when training uses information that would
+                        not legitimately be available at prediction time, or information
+                        derived from the target. It can make evaluation results look
+                        better than real-world performance.
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <h3 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq20">
+                        20. Is this model suitable for commercial pricing decisions?
+                    </button>
+                </h3>
+                <div id="faq20" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        Not without further validation. The model is intended as an
+                        educational demonstration. Commercial use would require
+                        representative data, rigorous evaluation, monitoring and
+                        checks for changing market conditions.
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<section class="section-space soft-section" id="sample-questions">
+    <div class="container">
+        <span class="text-primary fw-bold text-uppercase small">Practice and Viva Preparation</span>
+        <h2 class="section-title display-6 mt-2">Sample Questions and Answers</h2>
+        <p class="section-subtitle mb-4">
+            Use these questions to prepare for a project demonstration,
+            viva voce or machine learning interview.
+        </p>
+
+        <div class="content-panel">
+            <h5 class="fw-bold">Q1. What is the main objective of your project?</h5>
+            <p>To estimate a product's current price in INR using product attributes and a supervised machine learning regression model.</p>
+
+            <hr>
+
+            <h5 class="fw-bold">Q2. Why did you choose a Decision Tree Regressor?</h5>
+            <p>It can learn nonlinear relationships, model feature interactions and provide an understandable rule-based structure for numerical prediction.</p>
+
+            <hr>
+
+            <h5 class="fw-bold">Q3. What is the difference between classification and regression?</h5>
+            <p>Classification predicts discrete classes, while regression predicts numerical quantities such as a product's price.</p>
+
+            <hr>
+
+            <h5 class="fw-bold">Q4. What is the target variable?</h5>
+            <p><code>Current_Price_INR</code> is the target variable.</p>
+
+            <hr>
+
+            <h5 class="fw-bold">Q5. Why use One-Hot Encoding?</h5>
+            <p>It converts categorical text values into numerical indicator features that the model can process.</p>
+
+            <hr>
+
+            <h5 class="fw-bold">Q6. Why use a pipeline?</h5>
+            <p>A pipeline keeps preprocessing and model prediction together, helping ensure that the same transformations are applied to training and new inputs.</p>
+
+            <hr>
+
+            <h5 class="fw-bold">Q7. What is the purpose of train_test_split?</h5>
+            <p>It separates records into training and testing subsets so performance can be measured on records not used to fit the evaluation model.</p>
+
+            <hr>
+
+            <h5 class="fw-bold">Q8. Why is random_state set to 42?</h5>
+            <p>It makes the train-test split and tree randomness reproducible for the same data and software setup. The number 42 has no special mathematical advantage here.</p>
+
+            <hr>
+
+            <h5 class="fw-bold">Q9. What does max_depth=8 control?</h5>
+            <p>It limits how deep the decision tree can grow, helping control model complexity.</p>
+
+            <hr>
+
+            <h5 class="fw-bold">Q10. What is the difference between MAE and R²?</h5>
+            <p>MAE measures the average absolute prediction error in the target's units. R² compares the model's fit with a mean-prediction baseline.</p>
+
+            <hr>
+
+            <h5 class="fw-bold">Q11. Why should preprocessing be fitted only on training data?</h5>
+            <p>To avoid information from the test set influencing the learned preprocessing values and making evaluation misleading.</p>
+
+            <hr>
+
+            <h5 class="fw-bold">Q12. Can the model predict prices for completely new products?</h5>
+            <p>It can produce a prediction from the provided attributes, but reliability may be poor when the new product differs substantially from the training data.</p>
+
+            <hr>
+
+            <h5 class="fw-bold">Q13. What are the limitations of your project?</h5>
+            <p>Prediction quality depends on dataset size, quality, representativeness, historical relevance and the model's ability to generalize.</p>
+
+            <hr>
+
+            <h5 class="fw-bold">Q14. How could the project be improved?</h5>
+            <p>Compare alternative regressors, tune hyperparameters, use cross-validation, gather more recent data and evaluate the model on later time periods.</p>
+
+            <hr>
+
+            <h5 class="fw-bold">Q15. Why is the saved model useful?</h5>
+            <p>It stores the fitted preprocessing pipeline and regressor, allowing the application to make predictions without retraining for every form submission.</p>
+        </div>
+    </div>
+</section>
+
+</main>
+
+<footer>
+    <div class="container">
+        <div class="row align-items-center g-3">
+            <div class="col-md-7">
+                <h5 class="text-white fw-bold mb-1">
+                    <i class="bi bi-graph-up-arrow me-2"></i>PricePredict AI
+                </h5>
+                <p class="mb-0 small">
+                    An educational product price prediction project using
+                    machine learning and Flask.
+                </p>
+            </div>
+            <div class="col-md-5 text-md-end">
+                <a href="#home" class="me-3">Home</a>
+                <a href="#predict" class="me-3">Predict</a>
+                <a href="#faq">Help</a>
+                <p class="small mt-2 mb-0">
+                    &copy; {{ current_year|default(2026) }} Product Price Prediction Project
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    const predictionForm = document.getElementById("predictionForm");
+    const sampleButton = document.getElementById("sampleButton");
+    const resetButton = document.getElementById("resetButton");
+
+    sampleButton.addEventListener("click", function () {
+        document.getElementById("Platform").value = "Flipkart";
+        document.getElementById("Product_Category").value = "Watch";
+        document.getElementById("Condition").value = "New";
+        document.getElementById("Launch_Price_INR").value = "42042";
+        document.getElementById("Discount_Pct").value = "-1.6";
+        document.getElementById("Sale_Event").value = "None";
+        document.getElementById("Stock_Status").value = "In Stock";
+        document.getElementById("Rating").value = "4.7";
+        document.getElementById("Reviews_Count").value = "40";
+
+        document.getElementById("predict").scrollIntoView({
+            behavior: "smooth",
+            block: "start"
+        });
+    });
+
+    resetButton.addEventListener("click", function () {
+        window.setTimeout(function () {
+            predictionForm.querySelectorAll(".is-invalid").forEach(function (field) {
+                field.classList.remove("is-invalid");
+            });
+        }, 0);
+    });
+
+    predictionForm.addEventListener("submit", function (event) {
+        const launchPrice = Number(document.getElementById("Launch_Price_INR").value);
+        const discount = Number(document.getElementById("Discount_Pct").value);
+        const rating = Number(document.getElementById("Rating").value);
+        const reviews = Number(document.getElementById("Reviews_Count").value);
+
+        let valid = true;
+
+        function checkField(id, condition) {
+            const field = document.getElementById(id);
+            field.classList.toggle("is-invalid", !condition);
+            if (!condition) {
+                valid = false;
+            }
+        }
+
+        checkField("Launch_Price_INR",
+            document.getElementById("Launch_Price_INR").value !== "" &&
+            Number.isFinite(launchPrice) && launchPrice >= 0);
+
+        checkField("Discount_Pct",
+            document.getElementById("Discount_Pct").value !== "" &&
+            Number.isFinite(discount) && discount >= -100 && discount <= 100);
+
+        checkField("Rating",
+            document.getElementById("Rating").value !== "" &&
+            Number.isFinite(rating) && rating >= 0 && rating <= 5);
+
+        checkField("Reviews_Count",
+            document.getElementById("Reviews_Count").value !== "" &&
+            Number.isInteger(reviews) && reviews >= 0);
+
+        if (!predictionForm.checkValidity() || !valid) {
+            event.preventDefault();
+            event.stopPropagation();
+            predictionForm.classList.add("was-validated");
+        }
+    });
+</script>
+
+</body>
+</html>
